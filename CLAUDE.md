@@ -1,43 +1,57 @@
 # Returns Desk for Claude Code: operating instructions
 
-This file is the brain. Claude Code reads it at the start of every session. It says who this is for, how work gets done, and the one right way to do each recurring job.
+This is the internal returns desk for a retailer's operations lead. In a new installation ask for the business name, operator role and review priorities, then configure brand.json. The demo is fictional and must never be mixed with real records.
 
-## Who this is for
+Read the relevant command before acting. Answers start with the CLI, not memory. Read case and item history before a change. Never guess an ambiguous ID, money value, customer choice or completed refund. Unknown is not zero. A carrier status is not a warehouse receipt.
 
-- **Business:** [YOUR BUSINESS]
-- **Operator:** [YOUR NAME], [your role]
-- **What matters most:** [the one or two outcomes you care about]
+## One path for each recurring job
 
-Fill this in once. A worker with context knows. A worker without it guesses.
-
-## How to work
-
-1. **Take a brief, not a script.** The operator describes the outcome. You run the right command and present the answer.
-2. **Read before you write.** Before drafting anything about a record, read its full history first.
-3. **Plain language.** Short sentences. No filler. Numbers in tables.
-4. **Silent success, loud problems.** No play-by-play. Say what broke and what you did about it.
-5. **Stop at the line.** Anything that sends, deletes, or faces a customer waits for a yes in this session.
-
-## Routing table: one right way for each recurring job
-
-| When the operator asks for... | Use this |
+| Ask | Command |
 |---|---|
-| <!-- TODO(author): one row per slash command --> | `/...` |
+| Review every return and its outstanding work | `/returns` |
+| Prioritise late returns, inspection work and unconfirmed remedies | `/attention` |
+| Reconcile what has arrived against the expected units | `/receiving` |
+| List received units still waiting for inspection | `/inspection-queue` |
+| Review grading, quarantine and stock disposition evidence | `/dispositions` |
+| Review product and return-reason patterns | `/reasons` |
+| Review remedy decisions and external completion references | `/decisions` |
+| Review consumer-rights evidence, safety holds and retention dates | `/compliance` |
+| Review known goods value by currency and missing prices | `/value-at-risk` |
+| Read the operator activity trail | `/history` |
+| Read a return and its line balances | `/case` |
+| Read a line and its receipt, inspection and assessment history | `/item` |
+| Open a manually recorded return | `/add` |
+| Record an expected return line | `/add-item` |
+| Record a physical receipt with its unique dock reference | `/receive` |
+| Record inspected units, condition and disposition | `/inspect` |
+| Record the human consumer-rights assessment and customer choice | `/assess` |
+| Record the agreed remedy after inspection and assessment | `/resolve` |
+| Record evidence that the agreed remedy happened in another system | `/complete` |
+| Close a return after every line is complete | `/close` |
+| Cancel an unreceived return with a reason | `/cancel` |
+| Change the owner and review dates | `/assign` |
+| Append a return case note | `/log` |
+| Import saved Narvar return payloads from an authorised merchant archive | `/import` |
+| Write a new private JSON snapshot of all records | `/export` |
+| Prepare an internal remedy summary without sending | `/draft-resolution` |
+| Prepare the Monday returns review from three reports | `/weekly-review` |
+| Show CLI usage | `/help` |
+| Change a field or rule | `/customise` |
+| Add a report | `/new-view` |
+| Render paperwork | `/documents` |
+| Render existing reports | `/views` |
 
-If an ask fits nothing here, run the CLI directly (`npm run <cli> -- --help`) and then propose a new command for it.
+## Limits
 
-## Hard rules
+- Draft only. Nothing sends, buys labels, executes a refund or posts stock.
+- Consumer rights require human assessment. Read docs/compliance.md before interpreting findings. Service targets and retention review dates are business policies, not statutory deadlines.
+- Read docs/replace-narvar.md before an import. Use a fresh test database and --dry-run. Confirm currency and jurisdiction; do not infer them from locale or an email address.
+- Every mutation uses the one CLI and an actor label. Never bypass failed quantity, quarantine or remedy checks with direct SQL.
+- Preserve the evidence. Corrections are explicit amendments through tested migrations, never edits to applied migrations or deletion of receipt history.
+- New production database access, sharing, deletion or external integrations require the operator's instruction. Never expose snapshots or reports publicly.
 
-- Never send email or messages from here. Draft to `drafts/`, a person sends.
-- Never delete records without an explicit yes in this session. Prefer marking closed or archived.
-- Never invent a record. If a name is ambiguous, list the candidates and ask.
-- The database is the source of truth. If the answer is not in it, say so.
+## Files
 
-## Where things live
+scripts/returns.mjs is the CLI. supabase/migrations contains ordered migrations, supabase/seed.sql the demo. .claude/commands has the recurring recipes. views.json and documents.json declare read-only output. brand.json controls names and colours. DATABASE_URL selects PostgreSQL; otherwise use the local PGlite DATA_DIR. OUTPUT_DIR redirects generated files for verification.
 
-- `scripts/` the CLI. `scripts/lib/db.mjs` picks `DATABASE_URL` (Postgres, Supabase) or the embedded database in `.data/`.
-- `supabase/migrations/` the schema, plain SQL. `npm run migrate` applies it.
-- `.claude/commands/` the slash commands. Add one every time the same ask comes twice.
-- `docs/` the thesis and the guide for moving off Narvar.
-
-Built by Enterprise DNA. Installed and run for you as part of Omni: https://enterprisedna.co/omni/instead-of/narvar
+Any coding agent can follow these instructions. AGENTS.md points here. Installed and run through Omni by Enterprise DNA: https://enterprisedna.co/omni/instead-of/narvar.

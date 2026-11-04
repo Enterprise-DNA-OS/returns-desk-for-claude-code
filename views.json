@@ -1,13 +1,44 @@
 [
   {
     "name": "week",
-    "title": "This week",
-    "subtitle": "Returns Desk for Claude Code: what needs attention, rendered by npm run view",
+    "title": "Returns desk: the week",
+    "subtitle": "Internal review. Receipt and remedy records require human evidence.",
     "sections": [
       {
-        "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
+        "title": "Queue",
+        "sql": "select code,customer,owner,due,status,awaiting_receipt,awaiting_inspection,undecided,awaiting_completion from return_queue order by due,code"
+      },
+      {
+        "title": "Record checks",
+        "sql": "select * from compliance_findings order by case_code,code,rule"
+      }
+    ]
+  },
+  {
+    "name": "warehouse",
+    "title": "Warehouse return review",
+    "sections": [
+      {
+        "title": "Waiting for inspection",
+        "sql": "select code,case_code,sku,received,inspected,received-inspected as outstanding from item_balance where case_status='open' and received>inspected order by code"
+      },
+      {
+        "title": "Disposition evidence",
+        "sql": "select i.code,i.sku,x.quantity,x.grade,x.disposition,x.evidence from inspections x join items i on i.id=x.item_id order by i.code"
+      }
+    ]
+  },
+  {
+    "name": "reasons",
+    "title": "Product return reasons",
+    "sections": [
+      {
+        "title": "Reasons by product",
+        "sql": "select * from reason_summary order by units desc,sku"
+      },
+      {
+        "title": "Resolution progress",
+        "sql": "select code,sku,currency,remedy,amount_cents,attention from decision_queue order by code"
       }
     ]
   }

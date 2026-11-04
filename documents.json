@@ -1,11 +1,57 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
-    "file": "name",
+    "name": "return-receipt",
+    "title": "Return receipt and inspection record",
+    "for_each": "select id,code from cases order by code",
+    "file": "code",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      {
+        "title": "Case",
+        "sql": "select code,retailer,rma,order_number,customer,country,currency,owner,status,due from cases where id=$1",
+        "layout": "record"
+      },
+      {
+        "title": "Items",
+        "sql": "select code,sku,quantity,received,inspected,reason,requested from item_balance where case_id=$1 order by code"
+      },
+      {
+        "title": "Receipts",
+        "sql": "select i.code,r.reference,r.quantity,r.received_on,r.note,r.actor from receipts r join items i on i.id=r.item_id where i.case_id=$1 order by r.received_on,i.code"
+      },
+      {
+        "title": "Inspection evidence",
+        "sql": "select i.code,x.quantity,x.grade,x.disposition,x.evidence,x.actor from inspections x join items i on i.id=x.item_id where i.case_id=$1 order by i.code,x.created_at"
+      }
+    ]
+  },
+  {
+    "name": "resolution-review",
+    "title": "Remedy review and completion record",
+    "for_each": "select id,code from cases order by code",
+    "file": "code",
+    "sections": [
+      {
+        "title": "Case",
+        "sql": "select code,retailer,rma,order_number,customer,country,currency,owner,status,due from cases where id=$1",
+        "layout": "record"
+      },
+      {
+        "title": "Items",
+        "sql": "select code,sku,quantity,received,inspected,reason,requested from item_balance where case_id=$1 order by code"
+      },
+      {
+        "title": "Human assessment",
+        "sql": "select i.code,a.basis,a.severity,a.customer_choice,a.evidence,a.actor from assessments a join item_balance i on i.assessment_id=a.id where i.case_id=$1 order by i.code"
+      },
+      {
+        "title": "Remedy",
+        "note": "A decision is not proof of refund, exchange shipment or completed repair. External reference records the operator confirmation.",
+        "sql": "select i.code,r.remedy,r.amount_cents,c.currency,r.rationale,x.external_reference,x.note from resolutions r join items i on i.id=r.item_id join cases c on c.id=i.case_id left join completions x on x.resolution_id=r.id where c.id=$1 order by i.code"
+      },
+      {
+        "title": "Checks to review",
+        "sql": "select f.code,f.rule,f.finding from compliance_findings f join cases c on c.code=f.case_code where c.id=$1 order by f.code,f.rule"
+      }
     ]
   }
 ]

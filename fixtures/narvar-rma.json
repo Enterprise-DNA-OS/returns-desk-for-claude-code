@@ -1,0 +1,26 @@
+{
+  "return_tracking_status": "return_delivered_standard",
+  "rma_number": "SYNTHETIC-IMPORT-01",
+  "order_number": "SYNTHETIC-ORDER-01",
+  "return_creation_date": "2026-01-12T09:30:00Z",
+  "retailer_name": "Fictional Outdoor Shop",
+  "return_method": "mail",
+  "locale": "en_NZ",
+  "email": "demo@example.invalid",
+  "origin_country": "NZ",
+  "estimated_refund": "89.95",
+  "refund_method": "credit_card",
+  "items": [
+    {
+      "sku": "BAG-25",
+      "item_id": "LINE-1",
+      "line_number": "1",
+      "quantity": "1",
+      "reason": "Broken strap",
+      "reason_code": "FAULT",
+      "unit_price": "89.95",
+      "total_item_price": "89.95",
+      "transaction_type": "return"
+    }
+  ]
+}

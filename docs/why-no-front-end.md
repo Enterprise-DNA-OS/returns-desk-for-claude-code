@@ -1,24 +1,9 @@
-# Why there is no front end
+# Why this returns desk has no front end
 
-Narvar is a database with a subscription. The tables underneath it are ordinary: a few entities, a few relationships, a handful of workflows you repeat every week. What you pay for is the layer on top that lets people who do not write SQL get at those tables. Screens, filters, dashboards, forms.
+The internal weekly work is record work: receive units, inspect condition, record a customer choice, document a remedy and reconcile completion. An operator can do that through the CLI and an assistant. Read-only HTML shows the queue and produces paperwork without a server.
 
-That layer used to be the whole product, because talking to a database was hard. It is not hard any more. Open this folder in Claude Code, describe what you want, and it writes the query, runs it, and explains the answer. Ask a question the dashboard never had a chart for and you still get an answer.
+Narvar is broader than these records. It offers shopper-facing journeys and carrier integrations, and its Shield product includes proprietary fraud intelligence. This base does not reproduce the carrier network or that intelligence. It is an independently useful internal desk, not a replacement for every Narvar service.
 
-## What you gain
+A mobile app gives warehouse staff scanning, offline capture and a screen at the receiving bench. A customer portal lets shoppers request a return themselves. Those are not in the free base. Multiple staff also need authenticated roles and coordinated workflows; supplied actor labels are not a login system. Generated reports are dated snapshots, not a live screen. This base supports no label purchase, automatic payment or stock posting.
 
-- **Better answers.** A dashboard shows what the vendor decided to chart. Here you ask your own question, in your own words, and get it answered against your own data.
-- **No seats.** Everyone who needs to look can look. The bill does not grow with headcount.
-- **Your data in your Postgres.** Plain tables. Back them up, query them from anything, leave any time. There is no export step because there is nothing to leave.
-- **A process that matches you.** When your way of working changes, you add a command. You do not wait for a feature request to clear.
-
-## What you give up
-
-- **A visual board.** Stages are a table you ask about, not cards you drag.
-- **A phone app.** It runs where Claude Code runs.
-- **A vendor help desk.** This is open source. Enterprise DNA supports the installed version for businesses that want someone to call.
-
-## Who this fits
-
-Small teams who already use Claude Code, or who would rather learn to ask than learn another interface. If your team needs a screen to look at all day, keep Narvar. If you need the answers more than the screens, this is cheaper, faster and yours.
-
-Installed and run for you: https://enterprisedna.co/omni/instead-of/narvar
+Enterprise DNA scopes the required front end, scanning, integrations and access separately in the customer's version. Keep the existing operational services until the whole replacement process has been tested with real exports and agreed responsibilities. Use the base immediately for an internal trial, evidence review and data reconciliation.
