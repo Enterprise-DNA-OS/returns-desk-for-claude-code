@@ -80,8 +80,9 @@ try{
  const bad=structuredClone(fresh);bad.items=[...bad.items,...bad.items];await fail(importArgs(file('bad-lines.json',bad)),/Duplicate item/);
  const badQty=structuredClone(fresh);badQty.items[0].quantity='-1';await fail(importArgs(file('bad-qty.json',badQty)),/positive integer/);
  const missing=structuredClone(fresh);delete missing.items[0].item_id;delete missing.items[0].line_number;await fail(importArgs(file('missing.json',missing)),/item_id or line_number/);
- const unknown=structuredClone(fresh);unknown.rma_number='UNKNOWN-PRICE';delete unknown.items[0].unit_price;
+ const unknown=structuredClone(fresh);unknown.rma_number='UNKNOWN-PRICE';unknown.return_creation_date='2026-01-12T23:30:00-05:00';delete unknown.items[0].unit_price;
  await call(importArgs(file('unknown.json',unknown)));ok((await db.query("select i.* from items i join cases c on c.id=i.case_id where c.rma='UNKNOWN-PRICE'"))[0].unit_cents===null);
+ ok((await db.query("select opened_on from cases where rma='UNKNOWN-PRICE'"))[0].opened_on==='2026-01-13');
  const out=path.join(tmp,'export.json');await call(['export',out]);const snapshot=JSON.parse(fs.readFileSync(out,'utf8'));ok(snapshot.format==='returns-desk-v1');ok(Object.keys(snapshot.tables).length===10);ok(snapshot.tables.imports.length===2);
  await fail(['export',out],/EEXIST/);
  const draft=await call(['draft-resolution','R-T']);ok(fs.readFileSync(draft.file,'utf8').includes('DRAFT FOR INTERNAL REVIEW'));

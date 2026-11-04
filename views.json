@@ -6,7 +6,11 @@
     "sections": [
       {
         "title": "Queue",
-        "sql": "select code,customer,owner,due,status,awaiting_receipt,awaiting_inspection,undecided,awaiting_completion from return_queue order by due,code"
+        "sql": "select code,customer,owner,due,status from return_queue order by due,code"
+      },
+      {
+        "title": "Outstanding work by case",
+        "sql": "select code,awaiting_receipt,awaiting_inspection,undecided,awaiting_completion from return_queue order by due,code"
       },
       {
         "title": "Record checks",

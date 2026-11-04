@@ -8,7 +8,7 @@ import {table} from './lib/format.mjs';
 
 export const reads={
  'returns':"select code,customer,owner,country,currency,due,status,awaiting_receipt,awaiting_inspection,undecided,awaiting_completion from return_queue order by due,code",
- 'attention':"select code,customer,owner,attention,awaiting_receipt,awaiting_inspection,undecided,awaiting_completion from return_queue where status='open' and (due<current_date or awaiting_inspection>0 or awaiting_completion>0) order by due,code",
+ 'attention':"select code,owner,attention,awaiting_receipt,awaiting_inspection,awaiting_completion from return_queue where status='open' and (due<current_date or awaiting_inspection>0 or awaiting_completion>0) order by due,code",
  'receiving':"select code,case_code,sku,quantity,received,quantity-received as outstanding,owner from item_balance where case_status='open' and received<quantity order by due,code",
  'inspection-queue':"select code,case_code,sku,received,inspected,received-inspected as to_inspect,owner from item_balance where case_status='open' and received>inspected order by due,code",
  'dispositions':"select i.code,i.case_code,i.sku,x.quantity,x.grade,x.disposition,x.evidence,x.actor from inspections x join item_balance i on i.id=x.item_id order by i.code,x.created_at",
@@ -99,7 +99,8 @@ async function importNarvar(db,source,o){
   const key=JSON.stringify([retailer,rma]);if(seen.has(key))throw Error(`Duplicate RMA in file: ${retailer}/${rma}`);seen.add(key);
   const rawDate=text(p.return_creation_date,'return_creation_date');
   if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/.test(rawDate)||Number.isNaN(Date.parse(rawDate)))throw Error('Invalid return_creation_date timestamp');
-  const opened=date(rawDate.slice(0,10));if(opened>today())throw Error('Return creation date is in the future');
+  date(rawDate.slice(0,10)); // Reject impossible calendar days before Date can normalise them.
+  const opened=new Date(rawDate).toISOString().slice(0,10);if(opened>today())throw Error('Return creation date is in the future');
   const sourceStatus=text(p.return_tracking_status,'return_tracking_status');
   const sourceMethod=text(p.return_method,'return_method');
   if(!Array.isArray(p.items)||!p.items.length)throw Error('Each RMA needs items');
@@ -188,7 +189,7 @@ export async function run(db,args){
  if(command==='weekly-review')return {attention:await db.query(reads.attention),inspection_queue:await db.query(reads['inspection-queue']),compliance:await db.query(reads.compliance)};
  if(command==='export'){
   const snapshot={format:'returns-desk-v1',exported_at:new Date().toISOString(),tables:{}};
-  await db.exec('BEGIN READ ONLY');
+  await db.exec('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
   try{for(const t of ['cases','items','receipts','inspections','assessments','resolutions','completions','notes','imports','activity'])snapshot.tables[t]=await db.query(`select * from ${t} order by id`);}
   finally{await db.exec('ROLLBACK');}
   const file=path.resolve(pos[0]);fs.mkdirSync(path.dirname(file),{recursive:true,mode:0o700});fs.writeFileSync(file,JSON.stringify(snapshot,null,2)+'\n',{flag:'wx',mode:0o600});return {file,records:Object.values(snapshot.tables).reduce((n,r)=>n+r.length,0)};
